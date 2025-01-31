@@ -498,10 +498,11 @@ const QuestionnaireForm = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
           key={currentQuestionIndex}
         >
           <QuestionNumber>
-            {currentQuestionIndex + 1}/{questions.length}
+            Question {currentQuestionIndex + 1} sur {questions.length}
           </QuestionNumber>
           
           <Question>{questions[currentQuestionIndex].question}</Question>
@@ -509,166 +510,280 @@ const QuestionnaireForm = () => {
           <AnswerContainer>
             {questions[currentQuestionIndex].component}
           </AnswerContainer>
-        </QuestionContainer>
 
-        <NavigationContainer>
-          <NavigationButton 
-            variant="secondary" 
-            onClick={handlePrevious}
-            disabled={currentQuestionIndex === 0}
-          >
-            ←
-          </NavigationButton>
-          <NavigationButton 
-            variant="primary" 
-            onClick={handleNext}
-            disabled={currentQuestionIndex === questions.length - 1}
-          >
-            Entrée ↵
-          </NavigationButton>
-        </NavigationContainer>
+          <NavigationContainer>
+            <NavigationButton
+              onClick={handlePrevious}
+              disabled={currentQuestionIndex === 0}
+            >
+              Précédent
+            </NavigationButton>
+            <NavigationButton
+              onClick={handleNext}
+              disabled={currentQuestionIndex === questions.length - 1}
+            >
+              Suivant
+            </NavigationButton>
+          </NavigationContainer>
+        </QuestionContainer>
       </ContentContainer>
+
+      <ProgressIndicator>
+        {questions.map((_, index) => (
+          <ProgressDot key={index} active={index === currentQuestionIndex} />
+        ))}
+      </ProgressIndicator>
     </PageContainer>
   );
 };
 
 const PageContainer = styled.div`
   min-height: 100vh;
-  background: #1a1a1a;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
   color: white;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3498db, #2ecc71);
+  }
 `;
 
 const ProgressBar = styled.div<{ width: number }>`
-  height: 3px;
-  background: linear-gradient(90deg, #3f51b5 ${props => props.width}%, rgba(255,255,255,0.1) 0%);
-  transition: background 0.3s ease;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 4px;
+  width: ${props => props.width}%;
+  background: linear-gradient(90deg, #3498db, #2ecc71);
+  transition: width 0.3s ease;
+  z-index: 10;
 `;
 
 const ContentContainer = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem;
   max-width: 800px;
-  margin: 0 auto;
   width: 100%;
+  margin: 4rem auto;
+  padding: 2rem;
 `;
 
 const QuestionContainer = styled(motion.div)`
-  width: 100%;
-  text-align: center;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 3rem;
+  margin: 2rem 0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 `;
 
 const QuestionNumber = styled.div`
   font-size: 0.9rem;
-  color: rgba(255,255,255,0.5);
-  margin-bottom: 2rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 1rem;
+  font-weight: 500;
 `;
 
 const Question = styled.h2`
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 3rem;
-  line-height: 1.3;
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  line-height: 1.4;
+  background: linear-gradient(90deg, #fff, #e0e0e0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 `;
 
 const AnswerContainer = styled.div`
-  max-width: 600px;
-  margin: 0 auto;
+  margin-top: 2rem;
 `;
 
 const Input = styled.input`
   width: 100%;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid rgba(255,255,255,0.1);
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
   color: white;
-  font-size: 1.5rem;
-  padding: 1rem 0;
-  text-align: center;
+  font-size: 1.1rem;
   transition: all 0.3s ease;
-  
+
   &:focus {
     outline: none;
-    border-bottom-color: #3f51b5;
+    border-color: #3498db;
+    background: rgba(255, 255, 255, 0.1);
   }
-  
+
   &::placeholder {
-    color: rgba(255,255,255,0.3);
+    color: rgba(255, 255, 255, 0.4);
   }
 `;
 
 const Select = styled.select`
   width: 100%;
-  padding: 12px;
-  border: 1px solid #333;
-  border-radius: 4px;
-  background: #2a2a2a;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
   color: white;
-  margin-top: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.5em;
+
+  &:focus {
+    outline: none;
+    border-color: #3498db;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  option {
+    background: #2d2d2d;
+    color: white;
+    padding: 1rem;
+  }
 `;
 
 const TextArea = styled.textarea`
   width: 100%;
-  min-height: 100px;
-  padding: 12px;
-  border: 1px solid #333;
-  border-radius: 4px;
-  background: #2a2a2a;
+  min-height: 120px;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
   color: white;
-  margin-top: 8px;
+  font-size: 1.1rem;
   resize: vertical;
-`;
+  transition: all 0.3s ease;
 
-const Checkbox = styled.input`
-  margin-right: 8px;
+  &:focus {
+    outline: none;
+    border-color: #3498db;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 `;
 
 const CheckboxLabel = styled.label`
   display: flex;
   align-items: center;
-  margin: 8px 0;
+  padding: 1rem;
+  margin: 0.5rem 0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
   cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(4px);
+  }
+`;
+
+const Checkbox = styled.input`
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  margin-right: 1rem;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:checked {
+    background: #3498db;
+    border-color: #3498db;
+  }
+
+  &:checked::after {
+    content: '✓';
+    position: absolute;
+    color: white;
+    font-size: 16px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 `;
 
 const RadioGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 8px;
+  gap: 1rem;
 `;
 
 const NavigationContainer = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  margin-top: 3rem;
   gap: 1rem;
-  margin-top: 4rem;
 `;
 
-const NavigationButton = styled.button<{ variant: 'primary' | 'secondary' }>`
-  background: ${props => props.variant === 'primary' ? '#3f51b5' : 'transparent'};
-  color: white;
-  border: ${props => props.variant === 'secondary' ? '1px solid rgba(255,255,255,0.2)' : 'none'};
-  padding: ${props => props.variant === 'primary' ? '1rem 2rem' : '1rem'};
-  border-radius: 50px;
-  font-size: ${props => props.variant === 'primary' ? '1rem' : '1.5rem'};
+const NavigationButton = styled.button`
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
-  opacity: ${props => props.disabled ? 0.5 : 1};
-  pointer-events: ${props => props.disabled ? 'none' : 'auto'};
-  
-  &:hover {
-    background: ${props => props.variant === 'primary' ? '#4a5cc9' : 'rgba(255,255,255,0.1)'};
-    transform: translateY(-1px);
+  transition: all 0.3s ease;
+  background: ${props => props.disabled ? 'rgba(255, 255, 255, 0.1)' : 'rgba(52, 152, 219, 0.8)'};
+  color: white;
+
+  &:hover:not(:disabled) {
+    background: #3498db;
+    transform: translateY(-2px);
   }
-  
-  &:active {
-    transform: translateY(0);
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
   }
 `;
 
-export default QuestionnaireForm; 
+const ProgressIndicator = styled.div`
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+`;
+
+const ProgressDot = styled.div<{ active: boolean }>`
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: ${props => props.active ? '#3498db' : 'rgba(255, 255, 255, 0.2)'};
+  transition: all 0.3s ease;
+`;
+
+export default QuestionnaireForm;
