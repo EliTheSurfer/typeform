@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import styled from '@emotion/styled';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import profileIllustration from '../assets/profile.svg';
+import organizationIllustration from '../assets/organization.svg';
+import technicalIllustration from '../assets/technical.svg';
+import suggestionsIllustration from '../assets/suggestions.svg';
 
 type FormSection = 'profile' | 'organization' | 'technical' | 'suggestions';
 
@@ -49,6 +53,264 @@ type FormData = {
     improvements: string;
   };
 };
+
+// Move all styled components here, before the QuestionnaireForm component
+const PageContainer = styled.div`
+  min-height: 100vh;
+  height: 100vh;
+  background: #FFF0F0; // Light pink background
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  padding: 0;
+  overflow: hidden;
+  color: #4A2B29; // Dark brown text
+`;
+
+const ProgressBar = styled.div<{ width: number }>`
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: ${props => props.width}%;
+  background: linear-gradient(90deg, #E88B8B, #D35F5F);
+  transition: width 0.3s ease;
+  z-index: 10;
+`;
+
+const ContentContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const QuestionContainer = styled(motion.div)`
+  width: 90%;
+  max-width: 600px;
+  background: white;
+  border-radius: 32px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  position: relative;
+  margin: 2rem;
+`;
+
+const QuestionContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 2.5rem;
+  background: white;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 200px;
+    background: linear-gradient(180deg, #FFE5E5 0%, white 100%);
+    z-index: 0;
+    border-radius: 32px 32px 0 0;
+  }
+`;
+
+const Question = styled.h2`
+  font-size: 2rem;
+  font-weight: 600;
+  color: #4A2B29;
+  margin: 1.5rem 0;
+  line-height: 1.3;
+  position: relative;
+  z-index: 1;
+`;
+
+const AnswerContainer = styled.div`
+  position: relative;
+  z-index: 1;
+  margin-top: 1.5rem;
+`;
+
+const Input = styled.input`
+  width: 100%;
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid rgba(232, 139, 139, 0.2);
+  border-radius: 16px;
+  color: #4A2B29;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+
+  &:focus {
+    outline: none;
+    border-color: #E88B8B;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(232, 139, 139, 0.1);
+  }
+
+  &::placeholder {
+    color: rgba(74, 43, 41, 0.4);
+  }
+`;
+
+const Select = styled.select`
+  width: 100%;
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid rgba(232, 139, 139, 0.2);
+  border-radius: 16px;
+  color: #4A2B29;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  appearance: none;
+  backdrop-filter: blur(10px);
+
+  &:focus {
+    outline: none;
+    border-color: #E88B8B;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(232, 139, 139, 0.1);
+  }
+
+  option {
+    background: white;
+    color: #4A2B29;
+  }
+`;
+
+const TextArea = styled.textarea`
+  width: 100%;
+  min-height: 150px;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: white;
+  font-size: 1.25rem;
+  resize: vertical;
+  transition: all 0.3s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #6366f1;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+`;
+
+const CheckboxLabel = styled.label`
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  margin: 0.75rem 0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.25rem;
+  color: white;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+  }
+`;
+
+const Checkbox = styled.input`
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  margin-right: 1rem;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:checked {
+    background: #3498db;
+    border-color: #3498db;
+  }
+
+  &:checked::after {
+    content: '✓';
+    position: absolute;
+    color: white;
+    font-size: 16px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+`;
+
+const RadioGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+const Button = styled.button<{ variant: 'primary' | 'secondary' }>`
+  padding: 1rem 2rem;
+  background: ${props => props.variant === 'primary' ? 
+    'linear-gradient(135deg, #E88B8B, #D35F5F)' : 
+    'rgba(255, 255, 255, 0.8)'};
+  color: ${props => props.variant === 'primary' ? 'white' : '#4A2B29'};
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
+const QuestionNumber = styled.div`
+  font-size: 0.9rem;
+  color: #E88B8B;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  position: relative;
+  z-index: 1;
+`;
+
+const NavigationContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding: 1.5rem 2.5rem;
+  background: white;
+  border-top: 1px solid rgba(232, 139, 139, 0.1);
+`;
+
+// Add a global style to remove default margins and padding
+const GlobalStyle = styled.div`
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+`;
 
 const QuestionnaireForm = () => {
   const [currentSection, setCurrentSection] = useState<FormSection>('profile');
@@ -490,300 +752,71 @@ const QuestionnaireForm = () => {
   };
 
   return (
-    <PageContainer>
-      <ProgressBar width={(currentQuestionIndex / (questions.length - 1)) * 100} />
-      
-      <ContentContainer>
-        <QuestionContainer
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
-          key={currentQuestionIndex}
-        >
-          <QuestionNumber>
-            Question {currentQuestionIndex + 1} sur {questions.length}
-          </QuestionNumber>
-          
-          <Question>{questions[currentQuestionIndex].question}</Question>
-          
-          <AnswerContainer>
-            {questions[currentQuestionIndex].component}
-          </AnswerContainer>
-
-          <NavigationContainer>
-            <NavigationButton
-              onClick={handlePrevious}
-              disabled={currentQuestionIndex === 0}
+    <GlobalStyle>
+      <PageContainer>
+        <ProgressBar width={(currentQuestionIndex / (questions.length - 1)) * 100} />
+        <ContentContainer>
+          <AnimatePresence mode="wait">
+            <QuestionContainer
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ 
+                duration: 0.5,
+                type: "spring",
+                stiffness: 100 
+              }}
+              key={currentQuestionIndex}
             >
-              Précédent
-            </NavigationButton>
-            <NavigationButton
-              onClick={handleNext}
-              disabled={currentQuestionIndex === questions.length - 1}
-            >
-              Suivant
-            </NavigationButton>
-          </NavigationContainer>
-        </QuestionContainer>
-      </ContentContainer>
+              <QuestionContent>
+                <QuestionNumber>
+                  Question {currentQuestionIndex + 1} sur {questions.length}
+                </QuestionNumber>
+                
+                <Question>{questions[currentQuestionIndex].question}</Question>
+                
+                <AnswerContainer>
+                  {questions[currentQuestionIndex].component}
+                </AnswerContainer>
+              </QuestionContent>
 
-      <ProgressIndicator>
-        {questions.map((_, index) => (
-          <ProgressDot key={index} active={index === currentQuestionIndex} />
-        ))}
-      </ProgressIndicator>
-    </PageContainer>
+              <NavigationContainer>
+                <Button
+                  onClick={handlePrevious}
+                  disabled={currentQuestionIndex === 0}
+                  variant="secondary"
+                >
+                  ← Précédent
+                </Button>
+                <Button
+                  onClick={handleNext}
+                  disabled={currentQuestionIndex === questions.length - 1}
+                  variant="primary"
+                >
+                  Suivant →
+                </Button>
+              </NavigationContainer>
+            </QuestionContainer>
+          </AnimatePresence>
+        </ContentContainer>
+      </PageContainer>
+    </GlobalStyle>
   );
 };
 
-const PageContainer = styled.div`
-  min-height: 100vh;
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-  color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2rem;
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #3498db, #2ecc71);
+const getSectionIllustration = (section: FormSection) => {
+  switch (section) {
+    case 'profile':
+      return profileIllustration;
+    case 'organization':
+      return organizationIllustration;
+    case 'technical':
+      return technicalIllustration;
+    case 'suggestions':
+      return suggestionsIllustration;
+    default:
+      return profileIllustration;
   }
-`;
-
-const ProgressBar = styled.div<{ width: number }>`
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 4px;
-  width: ${props => props.width}%;
-  background: linear-gradient(90deg, #3498db, #2ecc71);
-  transition: width 0.3s ease;
-  z-index: 10;
-`;
-
-const ContentContainer = styled.div`
-  max-width: 800px;
-  width: 100%;
-  margin: 4rem auto;
-  padding: 2rem;
-`;
-
-const QuestionContainer = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 3rem;
-  margin: 2rem 0;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-`;
-
-const QuestionNumber = styled.div`
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.6);
-  margin-bottom: 1rem;
-  font-weight: 500;
-`;
-
-const Question = styled.h2`
-  font-size: 2rem;
-  font-weight: 600;
-  margin-bottom: 2rem;
-  line-height: 1.4;
-  background: linear-gradient(90deg, #fff, #e0e0e0);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-`;
-
-const AnswerContainer = styled.div`
-  margin-top: 2rem;
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  color: white;
-  font-size: 1.1rem;
-  transition: all 0.3s ease;
-
-  &:focus {
-    outline: none;
-    border-color: #3498db;
-    background: rgba(255, 255, 255, 0.1);
-  }
-
-  &::placeholder {
-    color: rgba(255, 255, 255, 0.4);
-  }
-`;
-
-const Select = styled.select`
-  width: 100%;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  color: white;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 1rem center;
-  background-size: 1.5em;
-
-  &:focus {
-    outline: none;
-    border-color: #3498db;
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-
-  option {
-    background: #2d2d2d;
-    color: white;
-    padding: 1rem;
-  }
-`;
-
-const TextArea = styled.textarea`
-  width: 100%;
-  min-height: 120px;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  color: white;
-  font-size: 1.1rem;
-  resize: vertical;
-  transition: all 0.3s ease;
-
-  &:focus {
-    outline: none;
-    border-color: #3498db;
-    background: rgba(255, 255, 255, 0.1);
-  }
-
-  &::placeholder {
-    color: rgba(255, 255, 255, 0.4);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-const CheckboxLabel = styled.label`
-  display: flex;
-  align-items: center;
-  padding: 1rem;
-  margin: 0.5rem 0;
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateX(4px);
-  }
-`;
-
-const Checkbox = styled.input`
-  appearance: none;
-  width: 24px;
-  height: 24px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 6px;
-  margin-right: 1rem;
-  position: relative;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:checked {
-    background: #3498db;
-    border-color: #3498db;
-  }
-
-  &:checked::after {
-    content: '✓';
-    position: absolute;
-    color: white;
-    font-size: 16px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-`;
-
-const RadioGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-`;
-
-const NavigationContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-top: 3rem;
-  gap: 1rem;
-`;
-
-const NavigationButton = styled.button`
-  padding: 1rem 2rem;
-  border: none;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background: ${props => props.disabled ? 'rgba(255, 255, 255, 0.1)' : 'rgba(52, 152, 219, 0.8)'};
-  color: white;
-
-  &:hover:not(:disabled) {
-    background: #3498db;
-    transform: translateY(-2px);
-  }
-
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-  }
-`;
-
-const ProgressIndicator = styled.div`
-  position: fixed;
-  bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 0.5rem;
-  padding: 1rem;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-`;
-
-const ProgressDot = styled.div<{ active: boolean }>`
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: ${props => props.active ? '#3498db' : 'rgba(255, 255, 255, 0.2)'};
-  transition: all 0.3s ease;
-`;
+};
 
 export default QuestionnaireForm;
