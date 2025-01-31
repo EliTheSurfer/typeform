@@ -62,16 +62,13 @@ const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: relative;
-  padding: 0;
-  margin: 0;
-  overflow-x: hidden;
-  color: #4A2B29;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; // Smooth scrolling on iOS
 `;
 
 const ProgressBar = styled.div<{ width: number }>`
@@ -93,6 +90,11 @@ const ContentContainer = styled.div`
   justify-content: center;
   padding: 20px;
   box-sizing: border-box;
+
+  @media (max-width: 768px) {
+    padding: 0;
+    align-items: flex-start;
+  }
 `;
 
 const QuestionContainer = styled(motion.div)`
@@ -104,6 +106,15 @@ const QuestionContainer = styled(motion.div)`
   overflow: hidden;
   position: relative;
   margin: 2rem;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
 `;
 
 const QuestionContent = styled.div`
@@ -112,6 +123,12 @@ const QuestionContent = styled.div`
   padding: 2.5rem;
   background: white;
   position: relative;
+  flex: 1;
+
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+    padding-top: 2rem;
+  }
 
   &::before {
     content: '';
@@ -123,6 +140,11 @@ const QuestionContent = styled.div`
     background: linear-gradient(180deg, #FFE5E5 0%, white 100%);
     z-index: 0;
     border-radius: 32px 32px 0 0;
+
+    @media (max-width: 768px) {
+      border-radius: 0;
+      height: 150px;
+    }
   }
 `;
 
@@ -134,12 +156,22 @@ const Question = styled.h2`
   line-height: 1.3;
   position: relative;
   z-index: 1;
+
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+    margin: 1rem 0;
+  }
 `;
 
 const AnswerContainer = styled.div`
   position: relative;
   z-index: 1;
   margin-top: 1.5rem;
+  flex: 1;
+
+  @media (max-width: 768px) {
+    margin-top: 1rem;
+  }
 `;
 
 const Input = styled.input`
@@ -152,6 +184,12 @@ const Input = styled.input`
   font-size: 1.1rem;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+    font-size: 1rem;
+    border-radius: 12px;
+  }
 
   &:focus {
     outline: none;
@@ -229,6 +267,12 @@ const CheckboxLabel = styled.label`
   font-size: 1.25rem;
   color: #4A2B29;
 
+  @media (max-width: 768px) {
+    padding: 1rem;
+    font-size: 1rem;
+    margin: 0.5rem 0;
+  }
+
   &:hover {
     background: rgba(232, 139, 139, 0.1);
     transform: translateY(-2px);
@@ -282,6 +326,14 @@ const Button = styled.button<{ variant: 'primary' | 'secondary' }>`
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
 
+  @media (max-width: 768px) {
+    padding: 0.875rem 1.5rem;
+    font-size: 0.9rem;
+    flex: 1;
+    margin: 0 0.5rem;
+    white-space: nowrap;
+  }
+
   &:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
@@ -309,6 +361,13 @@ const NavigationContainer = styled.div`
   padding: 1.5rem 2.5rem;
   background: white;
   border-top: 1px solid rgba(232, 139, 139, 0.1);
+
+  @media (max-width: 768px) {
+    padding: 1rem 1.5rem;
+    position: sticky;
+    bottom: 0;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+  }
 `;
 
 // Add a global style to remove default margins and padding
