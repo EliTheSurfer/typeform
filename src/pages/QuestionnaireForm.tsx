@@ -57,15 +57,21 @@ type FormData = {
 // Move all styled components here, before the QuestionnaireForm component
 const PageContainer = styled.div`
   min-height: 100vh;
-  height: 100vh;
-  background: #FFF0F0; // Light pink background
+  width: 100%;
+  background: #FFF0F0;
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
   padding: 0;
-  overflow: hidden;
-  color: #4A2B29; // Dark brown text
+  margin: 0;
+  overflow-x: hidden;
+  color: #4A2B29;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 `;
 
 const ProgressBar = styled.div<{ width: number }>`
@@ -81,12 +87,12 @@ const ProgressBar = styled.div<{ width: number }>`
 
 const ContentContainer = styled.div`
   width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
 `;
 
 const QuestionContainer = styled(motion.div)`
@@ -189,22 +195,24 @@ const TextArea = styled.textarea`
   width: 100%;
   min-height: 150px;
   padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  color: white;
-  font-size: 1.25rem;
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid rgba(232, 139, 139, 0.2);
+  border-radius: 16px;
+  color: #4A2B29;
+  font-size: 1.1rem;
   resize: vertical;
   transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
 
   &:focus {
     outline: none;
-    border-color: #6366f1;
-    background: rgba(255, 255, 255, 0.1);
+    border-color: #E88B8B;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(232, 139, 139, 0.1);
   }
 
   &::placeholder {
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(74, 43, 41, 0.4);
   }
 `;
 
@@ -214,15 +222,15 @@ const CheckboxLabel = styled.label`
   padding: 1.5rem;
   margin: 0.75rem 0;
   background: rgba(255, 255, 255, 0.05);
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(232, 139, 139, 0.2);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 1.25rem;
-  color: white;
+  color: #4A2B29;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(232, 139, 139, 0.1);
     transform: translateY(-2px);
   }
 `;
@@ -309,6 +317,48 @@ const GlobalStyle = styled.div`
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+  }
+`;
+
+const PriorityContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+`;
+
+const PriorityItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+const PriorityLabel = styled.label`
+  font-size: 1rem;
+  font-weight: 600;
+  color: #E88B8B;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #E88B8B;
+    border-radius: 50%;
+  }
+`;
+
+const PrioritySelect = styled(Select)`
+  background: white;
+  border: 2px solid rgba(232, 139, 139, 0.2);
+  transition: all 0.3s ease;
+
+  &:focus {
+    border-color: #E88B8B;
+    box-shadow: 0 0 0 4px rgba(232, 139, 139, 0.1);
   }
 `;
 
